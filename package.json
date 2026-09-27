@@ -1,6 +1,6 @@
 {
   "name": "obsidian-github-vault-sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Obsidian desktop plugin for GitHub vault synchronization",
   "main": "main.js",

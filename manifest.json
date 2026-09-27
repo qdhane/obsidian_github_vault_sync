@@ -1,7 +1,7 @@
 {
   "id": "github-vault-sync",
   "name": "Синхронизация заметок с GitHub",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.5.0",
   "description": "Безопасная синхронизация хранилища Obsidian с GitHub через локальный Git.",
   "author": "Danil",
