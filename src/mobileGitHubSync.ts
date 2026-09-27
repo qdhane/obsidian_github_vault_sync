@@ -41,6 +41,7 @@ export default class MobileGitHubSync {
           if (localHash !== known.localHash) continue;
         }
         const content = await this.download(repo, path);
+        await this.ensureParentFolders(path);
         await this.vault.adapter.write(normalizePath(path), content);
         state[path] = { remoteSha: file.sha, localHash: await this.hash(content) };
       }
@@ -122,6 +123,15 @@ export default class MobileGitHubSync {
   }
 
   private supported(path: string): boolean { return path.endsWith(".md") || path.endsWith(".canvas"); }
+  private async ensureParentFolders(path: string): Promise<void> {
+    const parts = normalizePath(path).split("/");
+    parts.pop();
+    let parent = "";
+    for (const part of parts) {
+      parent = parent ? `${parent}/${part}` : part;
+      if (!this.vault.getAbstractFileByPath(parent)) await this.vault.createFolder(parent);
+    }
+  }
   private encodePath(path: string): string { return path.split("/").map(encodeURIComponent).join("/"); }
   private base64(text: string): string { return btoa(String.fromCharCode(...new TextEncoder().encode(text))); }
   private fromBase64(value: string): string { return new TextDecoder().decode(Uint8Array.from(atob(value), char => char.charCodeAt(0))); }
