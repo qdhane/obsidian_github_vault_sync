@@ -34,7 +34,12 @@ export default class MobileGitHubSync {
       for (const [path, file] of remote) {
         const local = this.vault.getAbstractFileByPath(path);
         const known = state[path];
-        if (local instanceof TFile && !known) throw new Error(`Заметка «${path}» уже есть на iPhone и не имеет общей истории. Создайте чистое хранилище или разберите конфликт на компьютере.`);
+        if (local instanceof TFile && !known) {
+          const content = await this.download(repo, path);
+          if (await this.hash(await this.vault.read(local)) !== await this.hash(content)) throw new Error(`Заметка «${path}» уже есть на iPhone и не имеет общей истории. Создайте чистое хранилище или разберите конфликт на компьютере.`);
+          state[path] = { remoteSha: file.sha, localHash: await this.hash(content) };
+          continue;
+        }
         if (local instanceof TFile && known) {
           const localHash = await this.hash(await this.vault.read(local));
           if (localHash !== known.localHash && file.sha !== known.remoteSha) throw new Error(`Конфликт в заметке «${path}». Изменения есть и на iPhone, и в GitHub.`);
